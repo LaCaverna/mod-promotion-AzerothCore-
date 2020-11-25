@@ -13,9 +13,9 @@
 ###################################################################################################
 
 ###################################################################################################
-# 
+#
 # ANNOUNCE ENABLE
-# Enable Hello World message at server start 
+# Enable Hello World message at server start
 # default: true
 #
 #
@@ -97,7 +97,7 @@ mountPromotion = 42277
 #   Bags Enable
 #
 #   Description: Configuration for the backpacks in the promotion
-#   
+#
 #   Default: bagEnable.enable = true (enabled backpacks promotion)
 #   Default: bagReward.Id = 14156 Bottomless Bag Binds when equipped 18 Slot Bag)
 #   Default: automaticallyEquippedbags.enable = true (Allows In The Promotion To Equip The Bags)
@@ -116,7 +116,7 @@ bagReward.Id = 41599
 #
 #  Description: Class Armor Configuration
 #  Default: Armor Level 7 8
-#  Example: EQUIPMENT_SLOT_WARRIOR_TANK_HEAD = 41350 <-(ID Item) 
+#  Example: EQUIPMENT_SLOT_WARRIOR_TANK_HEAD = 41350 <-(ID Item)
 #
 ###################################################################################################
 # WARRIOR CLASS
@@ -471,3 +471,11 @@ EQUIPMENT_SLOT_DRUID_CASTER_RANGED = 38360
 ###################################################################################################
 
 ###################################################################################################
+#
+#
+# Teleport Config
+#  Description:
+#  Example: Dalaran (Teleported the Character to Dalaran)
+#
+teleportEnable = true
+homeLocation.promotion = Dalaran

@@ -15,9 +15,10 @@
 #include "mod_promotion.h"
 #include "World.h"
 
-static bool promotionEnable, mountEnable, bagEnable, equippedbags;
+static bool promotionEnable, mountEnable, bagEnable, equippedbags, teleportEnable;
 static int promotionCount, moneyRewardConst, mountPromotion, bagReward;
 static int classConfArmor, LevelForPromotion;
+static string teleportConfig;
 
 class announce_module : public PlayerScript{
 public:
@@ -26,11 +27,11 @@ public:
     void OnLogin(Player* player) override {
         if (sConfigMgr->GetBoolDefault("announce_module.enableHelloWorld", true))
         {
-            ChatHandler(player->GetSession()).SendSysMessage("Hello World from Promotion-Module! - By Asmadeuxx");
+            ChatHandler(player->GetSession()).SendSysMessage("Promotion-Module! - By Asmadeuxx");
         }
         else
         {
-            ChatHandler(player->GetSession()).SendSysMessage("Hello World from Promotion-Module! - By Asmadeuxx");
+            ChatHandler(player->GetSession()).SendSysMessage("Promotion-Module! - By Asmadeuxx");
         }
     }
 };
@@ -43,6 +44,9 @@ public:
     bool OnGossipHello(Player* player, Creature* creature) override
     {
         //ChatHandler handler();
+
+        if (player->IsInCombat())
+            return false;
 
         if (player->getClass() == CLASS_DEATH_KNIGHT)
         {
@@ -62,39 +66,39 @@ public:
         switch (player->getClass())
         {
         case CLASS_WARRIOR:
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "PvP Dps", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "PvP Tank", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Set Dps", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Set Tank", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
             break;
         case CLASS_WARLOCK:
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "PvP Dps", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Set Dps", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
             break;
         case CLASS_DRUID:
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "PvP Tank", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "PvP Heal", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "PvP Balance", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Set Tank", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Set Heal", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Set Balance", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
             break;
         case CLASS_HUNTER:
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "PvP Dps ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Set Dps ", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
             break;
         case CLASS_MAGE:
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "PvP Dps", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Set Dps", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
             break;
         case CLASS_ROGUE:
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "PvP Dps", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Set Dps", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
             break;
         case CLASS_PRIEST:
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "PvP Heal", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "PvP Shadow", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Set Heal", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Set Shadow", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
             break;
         case CLASS_PALADIN:
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "PvP Tank", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "PvP Heal", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 13);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "PvP Dps", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 14);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Set Tank", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 12);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Set Heal", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 13);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Set Dps", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 14);
             break;
         case CLASS_SHAMAN:
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "PvP Elemental", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 15);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "PvP Restoration", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 16);
-            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "PvP Enhancement", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 17);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Set Elemental", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 15);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Set Restoration", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 16);
+            AddGossipItemFor(player, GOSSIP_ICON_CHAT, "Set Enhancement", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 17);
             break;
         default:
             break;
@@ -494,93 +498,110 @@ public:
                 // Level
                 player->GiveLevel(sConfigMgr->GetIntDefault("LevelForPromotion", 80));
 
-        //Money 2,5k
-         MoneyReward(player);
+            //Money 2,5k
+            MoneyReward(player);
 
-         // Skill Max
-        player->UpdateSkillsToMaxSkillsForLevel();
-        // Riding 
-        player->learnSpell(SKILL_RIDING_75);
-        player->learnSpell(SKILL_RIDING_100);
-        player->learnSpell(SKILL_RIDING_FLYING);
-        player->learnSpell(SKILL_RIDING_ARTISING);
+            // Skill Max
+            player->UpdateSkillsToMaxSkillsForLevel();
+            // Riding
+            player->learnSpell(SKILL_RIDING_75);
+            player->learnSpell(SKILL_RIDING_100);
+            player->learnSpell(SKILL_RIDING_FLYING);
+            player->learnSpell(SKILL_RIDING_ARTISING);
 
-        creature->MonsterWhisper("You Got Your Promotion!", player);
+            creature->MonsterWhisper("Haz obtenido tu paquete de promoción.", player);
 
-        if (mountEnable)
-        {
-            player->learnSpell(sConfigMgr->GetIntDefault("mountPromotion", 42777)); //Swift Spectral Tiger
-        }
-        
-        //Bags
-        if (bagEnable)
-        {
-            if (equippedbags)
+            if (mountEnable)
             {
-                for (int slot = INVENTORY_SLOT_BAG_START; slot < INVENTORY_SLOT_BAG_END; slot++)
-                    if (Item* bag = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
-                        player->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
-
-                for (int slot = INVENTORY_SLOT_BAG_START; slot < INVENTORY_SLOT_BAG_END; slot++)
-                    player->EquipNewItem(slot, (sConfigMgr->GetIntDefault("bagReward.Id", 14156)), true);
-            }
-            else
-            {
-                player->AddItem((sConfigMgr->GetIntDefault("bagReward.Id", 14156)), 4);
+                player->learnSpell(sConfigMgr->GetIntDefault("mountPromotion", 42777)); //Swift Spectral Tiger
             }
 
-        }
+            //Bags
+            if (bagEnable)
+            {
+                if (equippedbags)
+                {
+                    for (int slot = INVENTORY_SLOT_BAG_START; slot < INVENTORY_SLOT_BAG_END; slot++)
+                        if (Item* bag = player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+                            player->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
 
-        switch (action)
-        {
-        case 1001:
-            WarriorPromotionDps(player);
-            break;
-        case 1002: 
-            WarriorPromotionTank(player);
-            break;
-        case 1003:
-            WarlockPromotionDps(player);
-            break;
-        case 1004:
-            DruidPromotionTank(player);
-            break;
-        case 1005:
-            DruidPromotionHeal(player);
-            break;
-        case 1006:
-            DruidPromotionCaster(player);
-            break;
-        case 1007:
-            HunterPromotion(player);
-            break;
-        case 1008:
-            MagePromotionDps(player);
-            break;
-        case 1009:
-            RoguePromotion(player);
-            break;
-        case 1010:
-            PriestPromotionHeal(player);
-            break;
-        case 1011:
-            PriestPromotionShadow(player);
-            break;
-        case 1012:
-            PaladinPromotionTank(player);
-            break;
-        case 1013:
-            PaladinPromotionHeal(player);
-            break;
-        case 1014:
-            PaladinPromotionDps(player);
-            break;
-        }
-    }
+                    for (int slot = INVENTORY_SLOT_BAG_START; slot < INVENTORY_SLOT_BAG_END; slot++)
+                        player->EquipNewItem(slot, (sConfigMgr->GetIntDefault("bagReward.Id", 14156)), true);
+                }
+                else
+                {
+                    player->AddItem((sConfigMgr->GetIntDefault("bagReward.Id", 14156)), 4);
+                }
 
-        else
-        {
+            }
+
+            switch (action)
+            {
+            case 1001:
+                WarriorPromotionDps(player);
+                break;
+            case 1002:
+                WarriorPromotionTank(player);
+                break;
+            case 1003:
+                WarlockPromotionDps(player);
+                break;
+            case 1004:
+                DruidPromotionTank(player);
+                break;
+            case 1005:
+                DruidPromotionHeal(player);
+                break;
+            case 1006:
+                DruidPromotionCaster(player);
+                break;
+            case 1007:
+                HunterPromotion(player);
+                break;
+            case 1008:
+                MagePromotionDps(player);
+                break;
+            case 1009:
+                RoguePromotion(player);
+                break;
+            case 1010:
+                PriestPromotionHeal(player);
+                break;
+            case 1011:
+                PriestPromotionShadow(player);
+                break;
+            case 1012:
+                PaladinPromotionTank(player);
+                break;
+            case 1013:
+                PaladinPromotionHeal(player);
+                break;
+            case 1014:
+                PaladinPromotionDps(player);
+                break;
+            }
+        } else if (pjts <= promotionCount) {
             SendGossipMenuFor(player, 80000, creature);
+            return true;
+        }
+
+        if (sConfigMgr->GetBoolDefault("teleportEnable", true))
+        {
+            std::string homeLocation = sConfigMgr->GetStringDefault("homeLocation.promotion", "Dalaran");
+            QueryResult result = WorldDatabase.PQuery("SELECT `map`, `position_x`, `position_y`, `position_z`, `orientation` FROM game_tele WHERE name = '%s'", homeLocation.c_str());
+
+            do
+            {
+                Field* fields = result->Fetch();
+                uint32 map = fields[0].GetUInt32();
+                float position_x = fields[1].GetFloat();
+                float position_y = fields[2].GetFloat();
+                float position_z = fields[3].GetFloat();
+                float orientation = fields[4].GetFloat();
+
+                player->TeleportTo(map, position_x, position_y, position_z, orientation);
+            } while (result->NextRow());
+            return true;
         }
 
         return true;
@@ -933,6 +954,9 @@ public:
             classConfArmor = sConfigMgr->GetIntDefault("EQUIPMENT_SLOT_DRUID_CASTER_BACK", 45810);
             classConfArmor = sConfigMgr->GetIntDefault("EQUIPMENT_SLOT_DRUID_CASTER_MAINHAND", 36975);
             classConfArmor = sConfigMgr->GetIntDefault("EQUIPMENT_SLOT_DRUID_CASTER_RANGED", 38360);
+
+            teleportEnable = sConfigMgr->GetBoolDefault("teleportEnable", true);
+            teleportConfig = sConfigMgr->GetStringDefault("homeLocation.promotion", "Dalaran");
         }
     }
 };
