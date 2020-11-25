@@ -580,7 +580,7 @@ public:
                 PaladinPromotionDps(player);
                 break;
             }
-        } else if (pjts <= promotionCount) {
+        } else if ((int)pjts <= promotionCount) {
             SendGossipMenuFor(player, 80000, creature);
             return true;
         }
